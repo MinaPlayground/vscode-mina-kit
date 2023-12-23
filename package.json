@@ -1,0 +1,60 @@
+{
+  "name": "vscode-webcontainer",
+  "displayName": "vscode-webcontainer",
+  "description": "webcontainer in vscode",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.84.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "browser": "./dist/web/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "vscode-webcontainer.openTerminal",
+        "title": "Open terminal"
+      },
+      {
+        "command": "vscode-webcontainer.readFiles",
+        "title": "Read files"
+      }
+    ]
+  },
+  "scripts": {
+    "test": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. --extensionTestsPath=dist/web/test/suite/index.js",
+    "pretest": "yarn run compile-web",
+    "install-all": "yarn && cd web-ui && yarn",
+    "build-all": "rollup --config && cd web-ui && yarn build",
+    "vscode:prepublish": "yarn run package-web",
+    "compile-web": "webpack",
+    "watch-web": "webpack --watch",
+    "package-web": "webpack --mode production --devtool hidden-source-map",
+    "lint": "eslint src --ext ts",
+    "run-in-browser": "vscode-test-web --browserType=none --coi --extensionDevelopmentPath=. ."
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.5",
+    "@types/mocha": "^10.0.3",
+    "@types/vscode": "^1.84.0",
+    "@types/webpack-env": "^1.18.3",
+    "@typescript-eslint/eslint-plugin": "^6.9.0",
+    "@typescript-eslint/parser": "^6.9.0",
+    "@vscode/test-web": "^0.0.48",
+    "assert": "^2.1.0",
+    "eslint": "^8.52.0",
+    "mocha": "^10.2.0",
+    "prettier": "^3.1.0",
+    "process": "^0.11.10",
+    "rollup": "^4.6.1",
+    "ts-loader": "^9.5.0",
+    "typescript": "^5.2.2",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "type": "module"
+}
