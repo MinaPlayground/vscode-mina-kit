@@ -1,5 +1,5 @@
 import 'xterm/css/xterm.css';
-import {useEffect, useRef} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import {WebContainer} from "@webcontainer/api";
 import {Terminal} from 'xterm'
 import {FitAddon} from 'xterm-addon-fit';
@@ -14,8 +14,9 @@ interface VsCodeApi {
 
 declare const acquireVsCodeApi: () => VsCodeApi;
 
-function App() {
+const WebContainerTerminal = ({onInitializingFinished}) => {
     const webcontainerInstance = useRef<any>();
+    const [isInitializing, setIsInitializing] = useState(true)
 
     useEffect(() => {
         const vscode = acquireVsCodeApi();
@@ -68,6 +69,8 @@ function App() {
                         terminal.onData((data) => {
                             input.write(data);
                         });
+                        setIsInitializing(false);
+                        onInitializingFinished(true);
                     })();
                     break;
             }
@@ -77,11 +80,12 @@ function App() {
 
     return (
         <>
-            <div className="flex h-screen">
-                <div className="terminal h-full w-full"/>
+            <div className="flex flex-col flex-1">
+                {isInitializing && <h1 className="text-lg py-2 text-white">Initializing terminal...</h1>}
+                <div className="terminal bg-black flex-1"/>
             </div>
         </>
     );
 }
 
-export default App
+export default WebContainerTerminal

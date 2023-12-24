@@ -1,27 +1,61 @@
-function App() {
-    return (
-        <section>
-            <div className="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16">
-                <h1 className="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-200 md:text-5xl lg:text-6xl">Mina kit</h1>
-                <p className="mb-8 text-lg font-normal text-gray-400 lg:text-xl sm:px-16 lg:px-48">The All-in-One Mina Protocol extension to run and deploy zkApps/Smart Contracts.</p>
-                <div className="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0">
-                    <a href="#"
-                       className="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-gradient-to-br from-pink-500 to-orange-400 focus:ring-4 focus:ring-blue-300">
-                        Initialize terminal
-                        <svg className="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true"
-                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M1 5h12m0 0L9 1m4 4L9 9"/>
-                        </svg>
-                    </a>
-                    <a href="#"
-                       className="inline-flex justify-center items-center py-3 px-5 sm:ms-4 text-base font-medium text-center text-gray-400 rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black focus:ring-4 focus:ring-gray-100">
-                        Deploy Smart Contract
-                    </a>
-                </div>
-            </div>
-        </section>
+import WebContainerTerminal from "./Terminal";
+import {useState} from "react";
 
+function App() {
+    const [initializingTerminal, setInitializingTerminal] = useState(false);
+    const [initializingFinished, setInitializingFinished] = useState(false);
+    return (
+        <main>
+            <section className="p-4">
+                <h1 className="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-200 md:text-5xl lg:text-6xl">Mina
+                    kit</h1>
+                <p className="mb-8 text-lg font-normal text-gray-400 lg:text-xl">The All-in-One Mina Protocol extension
+                    to run and deploy zkApps/Smart Contracts.</p>
+                <div className="flex">
+                    <div className="inline-flex rounded-md shadow-sm" role="group">
+                        {initializingFinished ? <button type="button" disabled={true}
+                                                        className="inline-flex items-center px-4 py-2 text-sm font-medium text-black bg-green-400 border border-gray-200 rounded-s-lg hover:text-black">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 me-2" viewBox="0 0 448 512">
+                                <path opacity="1" fill="currentColor"
+                                      d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"/>
+                            </svg>
+                            Terminal initialized
+                        </button> : <button type="button"
+                                            onClick={() => setInitializingTerminal(true)}
+                                            className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-br from-pink-500 to-orange-400  border border-gray-200 rounded-s-lg hover:text-black">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 me-2" viewBox="0 0 576 512">
+                                <path opacity="1" fill="currentColor"
+                                      d="M9.4 86.6C-3.1 74.1-3.1 53.9 9.4 41.4s32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L178.7 256 9.4 86.6zM256 416H544c17.7 0 32 14.3 32 32s-14.3 32-32 32H256c-17.7 0-32-14.3-32-32s14.3-32 32-32z"/>
+                            </svg>
+                            Initialize terminal
+                        </button>}
+
+                        <button type="button"
+                                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-br from-pink-500 to-orange-400  border-t border-b border-gray-200 hover:text-black">
+                            <svg className="w-3 h-3 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                 fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z"/>
+                                <path
+                                    d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/>
+                            </svg>
+                            Deploy Smart Contract
+                        </button>
+                        <button type="button"
+                                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-br from-pink-500 to-orange-400  border border-gray-200 rounded-e-lg hover:text-black">
+                            <svg className="w-3 h-3 me-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                <path opacity="1" fill="currentColor"
+                                      d="M463.5 224H472c13.3 0 24-10.7 24-24V72c0-9.7-5.8-18.5-14.8-22.2s-19.3-1.7-26.2 5.2L413.4 96.6c-87.6-86.5-228.7-86.2-315.8 1c-87.5 87.5-87.5 229.3 0 316.8s229.3 87.5 316.8 0c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0c-62.5 62.5-163.8 62.5-226.3 0s-62.5-163.8 0-226.3c62.2-62.2 162.7-62.5 225.3-1L327 183c-6.9 6.9-8.9 17.2-5.2 26.2s12.5 14.8 22.2 14.8H463.5z"/>
+                            </svg>
+                            Reload files
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+            {initializingTerminal ?
+                <WebContainerTerminal onInitializingFinished={() => setInitializingFinished(true)}/> : null}
+        </main>
     );
 }
 

@@ -5,3 +5,10 @@
 body {
     background-color: #202123;
 }
+
+main {
+    display: flex;
+    flex-direction: column;
+    height: 98vh;
+    width: 100vw;
+}
