@@ -1,5 +1,6 @@
 import {Uri, ViewColumn, Webview, WebviewPanel, window, Disposable, workspace, FileType, commands} from "vscode";
 import {PreviewPanel} from "./PreviewPanel";
+import {transformToWebcontainerFiles} from "../../utils/webcontainer";
 
 export function getWebviewOptions(extensionUri: Uri) {
     return {
@@ -75,7 +76,10 @@ export class WebcontainerPanel {
                         previewPanel.send(message.text);
                         break;
                     case 'initialize':
-                        this.initalize();
+                        void this.initalize();
+                        break;
+                    case 'reloadFiles':
+                        void this.reloadFiles();
                         break;
                 }
             },
@@ -103,31 +107,20 @@ export class WebcontainerPanel {
             return;
         }
 
-        const transformToWebcontainerFiles = async (dir: Uri, files: any = {}) => {
-            for (const [name, type] of await workspace.fs.readDirectory(dir)) {
-                if (type === FileType.File) {
-                    const filePath = Uri.joinPath(dir, name);
-                    const readData = await workspace.fs.readFile(filePath);
-                    const value = new TextDecoder().decode(readData);
-                    files[name] = {
-                        file: {
-                            contents: value,
-                        },
-                    };
-                }
-                if (type === FileType.Directory) {
-                    files[name] = {
-                        directory: {},
-                    };
-                    await transformToWebcontainerFiles(Uri.joinPath(dir, name), files[name].directory);
-                }
-            }
-            return files;
-        };
-
         const files = await transformToWebcontainerFiles(folder.uri);
         this._panel.webview.postMessage({command: 'loadFiles', files});
     }
+
+    public async reloadFiles() {
+        const folder = workspace.workspaceFolders?.[0];
+        if (!folder) {
+            return;
+        }
+
+        const files = await transformToWebcontainerFiles(folder.uri);
+        this._panel.webview.postMessage({command: 'reloadFiles', files});
+    }
+
 
     public dispose() {
         WebcontainerPanel.currentPanel = undefined;
