@@ -1,9 +1,24 @@
 import WebContainerTerminal from "./Terminal";
 import {useState} from "react";
 
+interface VsCodeApi {
+    postMessage(message: any): void;
+
+    setState(state: any): void;
+
+    getState(): any;
+}
+
+declare const acquireVsCodeApi: () => VsCodeApi;
+const vscode = acquireVsCodeApi();
+
 function App() {
     const [initializingTerminal, setInitializingTerminal] = useState(false);
     const [initializingFinished, setInitializingFinished] = useState(false);
+
+    const onReload = () => {
+        vscode.postMessage({command: 'reloadFiles'})
+    }
     return (
         <main>
             <section className="p-4">
@@ -42,6 +57,7 @@ function App() {
                             Deploy Smart Contract
                         </button>
                         <button type="button"
+                                onClick={onReload}
                                 className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-br from-pink-500 to-orange-400  border border-gray-200 rounded-e-lg hover:text-black">
                             <svg className="w-3 h-3 me-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                                 <path opacity="1" fill="currentColor"
@@ -54,7 +70,7 @@ function App() {
                 </div>
             </section>
             {initializingTerminal ?
-                <WebContainerTerminal onInitializingFinished={() => setInitializingFinished(true)}/> : null}
+                <WebContainerTerminal vscode={vscode} onInitializingFinished={() => setInitializingFinished(true)}/> : null}
         </main>
     );
 }
