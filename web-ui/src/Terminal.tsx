@@ -4,23 +4,15 @@ import {WebContainer} from "@webcontainer/api";
 import {Terminal} from 'xterm'
 import {FitAddon} from 'xterm-addon-fit';
 
-interface VsCodeApi {
-    postMessage(message: any): void;
-
-    setState(state: any): void;
-
-    getState(): any;
-}
-
-declare const acquireVsCodeApi: () => VsCodeApi;
-
-const WebContainerTerminal = ({onInitializingFinished}) => {
+const WebContainerTerminal = ({onInitializingFinished, vscode}) => {
     const webcontainerInstance = useRef<any>();
     const [isInitializing, setIsInitializing] = useState(true)
 
-    useEffect(() => {
-        const vscode = acquireVsCodeApi();
+    const reloadFiles = async (files) => {
+        await webcontainerInstance.current.mount(files);
+    }
 
+    useEffect(() => {
         window.addEventListener('message', event => {
             const message = event.data;
             switch (message.command) {
@@ -72,6 +64,10 @@ const WebContainerTerminal = ({onInitializingFinished}) => {
                         setIsInitializing(false);
                         onInitializingFinished(true);
                     })();
+                    break;
+                case 'reloadFiles':
+                    void reloadFiles(message.files);
+                    console.log('reloaded')
                     break;
             }
         });
