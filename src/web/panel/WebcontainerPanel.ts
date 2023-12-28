@@ -1,6 +1,6 @@
 import {Uri, ViewColumn, Webview, WebviewPanel, window, Disposable, workspace, FileType, commands} from "vscode";
 import {PreviewPanel} from "./PreviewPanel";
-import {transformToWebcontainerFiles} from "../../utils/webcontainer";
+import {getSmartContractItems, transformToWebcontainerFiles} from "../../utils/webcontainer";
 
 export function getWebviewOptions(extensionUri: Uri) {
     return {
@@ -81,6 +81,9 @@ export class WebcontainerPanel {
                     case 'reloadFiles':
                         void this.reloadFiles();
                         break;
+                    case 'findSmartContracts':
+                        void this.findSmartContracts();
+                        break;
                 }
             },
             null,
@@ -119,6 +122,16 @@ export class WebcontainerPanel {
 
         const files = await transformToWebcontainerFiles(folder.uri);
         this._panel.webview.postMessage({command: 'reloadFiles', files});
+    }
+
+    public async findSmartContracts() {
+        const folder = workspace.workspaceFolders?.[0];
+        if (!folder) {
+            return;
+        }
+
+        const items = await getSmartContractItems(folder.uri);
+        this._panel.webview.postMessage({command: 'findSmartContracts', items});
     }
 
 

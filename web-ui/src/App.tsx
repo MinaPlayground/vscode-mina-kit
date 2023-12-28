@@ -1,5 +1,5 @@
 import WebContainerTerminal from "./Terminal";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import CTAModal from "./components/CTAModal";
 import Select from "./components/Select";
 
@@ -11,16 +11,29 @@ interface VsCodeApi {
     getState(): any;
 }
 
-const acquireVsCodeApi = () => {
+// const acquireVsCodeApi = () => {
+//
+// }
 
-}
-
-// declare const acquireVsCodeApi: () => VsCodeApi;
+declare const acquireVsCodeApi: () => VsCodeApi;
 const vscode = acquireVsCodeApi();
 
 function App() {
     const [initializingTerminal, setInitializingTerminal] = useState(false);
     const [initializingFinished, setInitializingFinished] = useState(false);
+
+    useEffect(() => {
+        window.addEventListener('message', event => {
+            const message = event.data;
+            switch (message.command) {
+                case 'findSmartContracts':
+                    console.log(message.items);
+                    break;
+            }
+        });
+
+        vscode.postMessage({command: 'findSmartContracts'})
+    }, [])
 
     const onReload = () => {
         vscode.postMessage({command: 'reloadFiles'})
@@ -52,7 +65,7 @@ function App() {
                         </button>}
 
                         <button type="button"
-                                onClick={() => document.getElementById('deployModal').showModal()}
+                                onClick={() => (document.getElementById('deployModal') as HTMLFormElement).showModal()}
                                 className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-br from-pink-500 to-orange-400  border-t border-b border-gray-200 hover:text-black">
                             <svg className="w-3 h-3 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                  fill="currentColor" viewBox="0 0 20 20">
