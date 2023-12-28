@@ -1,5 +1,6 @@
 import WebContainerTerminal from "./Terminal";
 import {useState} from "react";
+import CTAModal from "../../src/components/CTAModal";
 
 interface VsCodeApi {
     postMessage(message: any): void;
@@ -9,7 +10,11 @@ interface VsCodeApi {
     getState(): any;
 }
 
-declare const acquireVsCodeApi: () => VsCodeApi;
+const acquireVsCodeApi = () => {
+
+}
+
+// declare const acquireVsCodeApi: () => VsCodeApi;
 const vscode = acquireVsCodeApi();
 
 function App() {
@@ -46,6 +51,7 @@ function App() {
                         </button>}
 
                         <button type="button"
+                                onClick={() => document.getElementById('deployModal').showModal()}
                                 className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-br from-pink-500 to-orange-400  border-t border-b border-gray-200 hover:text-black">
                             <svg className="w-3 h-3 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                  fill="currentColor" viewBox="0 0 20 20">
@@ -69,6 +75,14 @@ function App() {
 
                 </div>
             </section>
+            <CTAModal title="Deploy Smart Contract" id="deployModal">
+                <p className="py-4">Select a Smart Contract</p>
+                <div className="modal-action">
+                    <form method="dialog">
+                        <button className="btn">Close</button>
+                    </form>
+                </div>
+            </CTAModal>
             {initializingTerminal ?
                 <WebContainerTerminal vscode={vscode} onInitializingFinished={() => setInitializingFinished(true)}/> : null}
         </main>
