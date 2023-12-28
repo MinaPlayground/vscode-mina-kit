@@ -1,6 +1,7 @@
 import WebContainerTerminal from "./Terminal";
 import {useState} from "react";
-import CTAModal from "../../src/components/CTAModal";
+import CTAModal from "./components/CTAModal";
+import Select from "./components/Select";
 
 interface VsCodeApi {
     postMessage(message: any): void;
@@ -77,6 +78,7 @@ function App() {
             </section>
             <CTAModal title="Deploy Smart Contract" id="deployModal">
                 <p className="py-4">Select a Smart Contract</p>
+                <Select title="Select a Smart Contract" items={[{value: '/test', name: 'Test'}, {value: '/test2', name: 'Test2'}]} onChange={() => null}/>
                 <div className="modal-action">
                     <form method="dialog">
                         <button className="btn">Close</button>
