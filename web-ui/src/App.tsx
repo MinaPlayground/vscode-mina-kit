@@ -13,17 +13,17 @@ interface VsCodeApi {
     getState(): any;
 }
 
-const acquireVsCodeApi = () => {
+// const acquireVsCodeApi = () => {
+//
+// }
 
-}
-
-// declare const acquireVsCodeApi: () => VsCodeApi;
+declare const acquireVsCodeApi: () => VsCodeApi;
 const vscode = acquireVsCodeApi();
 
 const webcontainerAtom = atom<WebContainer | null>(null)
 
 function App() {
-    const [initializingTerminal, setInitializingTerminal] = useState(false);
+    const [initializingTerminal, setInitializingTerminal] = useState(true);
     const [initializingFinished, setInitializingFinished] = useState(false);
     const [webcontainer, setWebcontainer] = useAtom(webcontainerAtom)
 
@@ -39,12 +39,12 @@ function App() {
         });
 
         // vscode.postMessage({command: 'findSmartContracts'})
-        void initializeWebcontainer()
+        // void initializeWebcontainer()
     }, [])
 
     const initializeWebcontainer = async () => {
         const webcontainerInstance = await WebContainer.boot();
-        setWebcontainer(webcontainerInstance)
+        // setWebcontainer(webcontainerInstance)
         // await webcontainerInstance.mount();
         const shellProcess = await webcontainerInstance.spawn('jsh');
     }
@@ -101,13 +101,13 @@ function App() {
                             </svg>
                             Terminal initialized
                         </button> : <button type="button"
-                                            onClick={() => setInitializingTerminal(true)}
+                                            disabled={true}
                                             className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-br from-pink-500 to-orange-400  border border-gray-200 rounded-s-lg hover:text-black">
                             <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 me-2" viewBox="0 0 576 512">
                                 <path opacity="1" fill="currentColor"
                                       d="M9.4 86.6C-3.1 74.1-3.1 53.9 9.4 41.4s32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L178.7 256 9.4 86.6zM256 416H544c17.7 0 32 14.3 32 32s-14.3 32-32 32H256c-17.7 0-32-14.3-32-32s14.3-32 32-32z"/>
                             </svg>
-                            Initialize terminal
+                            Initializing terminal...
                         </button>}
 
                         <button type="button"
@@ -151,9 +151,7 @@ function App() {
                     </form>
                 </div>
             </CTAModal>
-            {initializingTerminal ?
-                <WebContainerTerminal vscode={vscode}
-                                      onInitializingFinished={() => setInitializingFinished(true)}/> : null}
+            <WebContainerTerminal vscode={vscode} onInitializingFinished={() => setInitializingFinished(true)}/>
         </main>
     );
 }
