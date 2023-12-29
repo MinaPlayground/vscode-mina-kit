@@ -2,6 +2,8 @@ import WebContainerTerminal from "./Terminal";
 import {useEffect, useState} from "react";
 import CTAModal from "./components/CTAModal";
 import Select from "./components/Select";
+import {atom, useAtom} from "jotai";
+import {WebContainer} from "@webcontainer/api";
 
 interface VsCodeApi {
     postMessage(message: any): void;
@@ -11,16 +13,20 @@ interface VsCodeApi {
     getState(): any;
 }
 
-// const acquireVsCodeApi = () => {
-//
-// }
+const acquireVsCodeApi = () => {
 
-declare const acquireVsCodeApi: () => VsCodeApi;
+}
+
+// declare const acquireVsCodeApi: () => VsCodeApi;
 const vscode = acquireVsCodeApi();
+
+const webcontainerAtom = atom<WebContainer | null>(null)
 
 function App() {
     const [initializingTerminal, setInitializingTerminal] = useState(false);
     const [initializingFinished, setInitializingFinished] = useState(false);
+    const [webcontainer, setWebcontainer] = useAtom(webcontainerAtom)
+
 
     useEffect(() => {
         window.addEventListener('message', event => {
@@ -32,11 +38,51 @@ function App() {
             }
         });
 
-        vscode.postMessage({command: 'findSmartContracts'})
+        // vscode.postMessage({command: 'findSmartContracts'})
+        void initializeWebcontainer()
     }, [])
 
+    const initializeWebcontainer = async () => {
+        const webcontainerInstance = await WebContainer.boot();
+        setWebcontainer(webcontainerInstance)
+        // await webcontainerInstance.mount();
+        const shellProcess = await webcontainerInstance.spawn('jsh');
+    }
+
     const onReload = () => {
-        vscode.postMessage({command: 'reloadFiles'})
+        // vscode.postMessage({command: 'reloadFiles'})
+    }
+
+    const deploySmartContract = async (path: string, feePayerKey: string) => {
+        const process = await webcontainer.spawn("npm", [
+            "run",
+            "build",
+        ]);
+        await process?.exit;
+
+        const deployProcess = await webcontainer.spawn("npx", [
+            "--yes",
+            "easy-mina-deploy",
+            "deploy",
+            "--path",
+            path,
+            "--className",
+            "Add",
+            "--feePayerKey",
+            feePayerKey,
+        ]);
+
+        deployProcess.output.pipeTo(
+            new WritableStream({
+                write(data) {
+                    console.log(data)
+                    if (data.startsWith("{")) {
+                    }
+                },
+            })
+        );
+
+        await deployProcess.exit;
     }
     return (
         <main>
@@ -90,8 +136,15 @@ function App() {
                 </div>
             </section>
             <CTAModal title="Deploy Smart Contract" id="deployModal">
-                <p className="py-4">Select a Smart Contract</p>
-                <Select title="Select a Smart Contract" items={[{value: '/test', name: 'Test'}, {value: '/test2', name: 'Test2'}]} onChange={() => null}/>
+                <Select title="Select a Smart Contract"
+                        items={[{value: '/test', name: 'Test'}, {value: '/test2', name: 'Test2'}]}
+                        onChange={() => null}/>
+                <label className="form-control w-full max-w-xs">
+                    <div className="label">
+                        <span className="label-text">Fill in your contracts path</span>
+                    </div>
+                    <input type="text" placeholder="e.g. contracts" className="input input-bordered w-full max-w-xs"/>
+                </label>
                 <div className="modal-action">
                     <form method="dialog">
                         <button className="btn">Close</button>
@@ -99,7 +152,8 @@ function App() {
                 </div>
             </CTAModal>
             {initializingTerminal ?
-                <WebContainerTerminal vscode={vscode} onInitializingFinished={() => setInitializingFinished(true)}/> : null}
+                <WebContainerTerminal vscode={vscode}
+                                      onInitializingFinished={() => setInitializingFinished(true)}/> : null}
         </main>
     );
 }
