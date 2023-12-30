@@ -2,7 +2,7 @@ import WebContainerTerminal from "./Terminal";
 import {useEffect, useState} from "react";
 import CTAModal from "./components/CTAModal";
 import Select from "./components/Select";
-import {atom, useAtom, useAtomValue} from "jotai";
+import {atom, useAtomValue} from "jotai";
 import {WebContainer} from "@webcontainer/api";
 
 interface VsCodeApi {
@@ -26,6 +26,7 @@ export const initializingFinishedAtom = atom<boolean>(false)
 function App() {
     const initializingFinished = useAtomValue(initializingFinishedAtom)
     const webcontainer = useAtomValue(webcontainerAtom)
+    const [path, setPath] = useState('')
 
     useEffect(() => {
         window.addEventListener('message', event => {
@@ -36,7 +37,6 @@ function App() {
                     break;
             }
         });
-        vscode.postMessage({command: 'findSmartContracts'})
     }, [])
 
     const onReload = () => {
@@ -134,9 +134,10 @@ function App() {
                     <div className="label">
                         <span className="label-text">Fill in your contracts path</span>
                     </div>
-                    <input type="text" placeholder="e.g. contracts" className="input input-bordered w-full max-w-xs"/>
+                    <input type="text" placeholder="e.g. contracts" value={path} onChange={(event) => setPath(event.target.value)} className="input input-bordered w-full max-w-xs"/>
                 </label>
                 <div className="modal-action">
+                    <button onClick={() => vscode.postMessage({command: 'findSmartContracts', path})} className="btn">Submit</button>
                     <form method="dialog">
                         <button className="btn">Close</button>
                     </form>

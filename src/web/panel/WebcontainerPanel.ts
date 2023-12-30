@@ -82,7 +82,7 @@ export class WebcontainerPanel {
                         void this.reloadFiles();
                         break;
                     case 'findSmartContracts':
-                        void this.findSmartContracts();
+                        void this.findSmartContracts(message.path);
                         break;
                 }
             },
@@ -124,13 +124,12 @@ export class WebcontainerPanel {
         this._panel.webview.postMessage({command: 'reloadFiles', files});
     }
 
-    public async findSmartContracts() {
+    public async findSmartContracts(path: string) {
         const folder = workspace.workspaceFolders?.[0];
         if (!folder) {
             return;
         }
-
-        const items = await getSmartContractItems(folder.uri);
+        const items = await getSmartContractItems(Uri.joinPath(folder.uri, path));
         this._panel.webview.postMessage({command: 'findSmartContracts', items});
     }
 
