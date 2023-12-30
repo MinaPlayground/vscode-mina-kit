@@ -43,7 +43,7 @@ function App() {
 
     const initializeWebcontainer = async () => {
         const webcontainerInstance = await WebContainer.boot();
-        // setWebcontainer(webcontainerInstance)
+        setWebcontainer(webcontainerInstance)
         // await webcontainerInstance.mount();
         const shellProcess = await webcontainerInstance.spawn('jsh');
     }
@@ -53,6 +53,7 @@ function App() {
     }
 
     const deploySmartContract = async (path: string, feePayerKey: string) => {
+        if (!webcontainer) return
         const process = await webcontainer.spawn("npm", [
             "run",
             "build",

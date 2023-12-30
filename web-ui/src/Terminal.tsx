@@ -24,13 +24,13 @@ const WebContainerTerminal = ({vscode}) => {
                     break;
                 case 'loadFiles':
                     (async () => {
-                        const terminalEl = document.querySelector('.terminal');
+                        const terminalEl = document.querySelector('.terminal') as HTMLElement;
                         const terminal = new Terminal({
                             convertEol: true,
                         });
                         const fitAddon = new FitAddon();
                         terminal.loadAddon(fitAddon);
-                        terminal.open(terminalEl as HTMLElement);
+                        terminal.open(terminalEl);
                         fitAddon.fit();
                         webcontainerInstance.current = await WebContainer.boot();
                         const bootFiles = message.files
