@@ -2,7 +2,7 @@ import WebContainerTerminal from "./Terminal";
 import {useEffect, useState} from "react";
 import CTAModal from "./components/CTAModal";
 import Select from "./components/Select";
-import {atom, useAtom} from "jotai";
+import {atom, useAtom, useAtomValue} from "jotai";
 import {WebContainer} from "@webcontainer/api";
 
 interface VsCodeApi {
@@ -21,12 +21,11 @@ declare const acquireVsCodeApi: () => VsCodeApi;
 const vscode = acquireVsCodeApi();
 
 const webcontainerAtom = atom<WebContainer | null>(null)
+export const initializingFinishedAtom = atom<boolean>(false)
 
 function App() {
-    const [initializingTerminal, setInitializingTerminal] = useState(true);
-    const [initializingFinished, setInitializingFinished] = useState(false);
+    const initializingFinished = useAtomValue(initializingFinishedAtom)
     const [webcontainer, setWebcontainer] = useAtom(webcontainerAtom)
-
 
     useEffect(() => {
         window.addEventListener('message', event => {
@@ -151,7 +150,7 @@ function App() {
                     </form>
                 </div>
             </CTAModal>
-            <WebContainerTerminal vscode={vscode} onInitializingFinished={() => setInitializingFinished(true)}/>
+            <WebContainerTerminal vscode={vscode}/>
         </main>
     );
 }

@@ -3,9 +3,12 @@ import {useEffect, useRef, useState} from 'react'
 import {WebContainer} from "@webcontainer/api";
 import {Terminal} from 'xterm'
 import {FitAddon} from 'xterm-addon-fit';
+import {useSetAtom} from "jotai";
+import {initializingFinishedAtom} from "./App";
 
-const WebContainerTerminal = ({onInitializingFinished, vscode}) => {
+const WebContainerTerminal = ({vscode}) => {
     const webcontainerInstance = useRef<any>();
+    const setInitializingFinished = useSetAtom(initializingFinishedAtom)
     const [isInitializing, setIsInitializing] = useState(true)
 
     const reloadFiles = async (files) => {
@@ -62,12 +65,11 @@ const WebContainerTerminal = ({onInitializingFinished, vscode}) => {
                             input.write(data);
                         });
                         setIsInitializing(false);
-                        onInitializingFinished(true);
+                        setInitializingFinished(true);
                     })();
                     break;
                 case 'reloadFiles':
                     void reloadFiles(message.files);
-                    console.log('reloaded')
                     break;
             }
         });
