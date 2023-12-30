@@ -20,12 +20,12 @@ interface VsCodeApi {
 declare const acquireVsCodeApi: () => VsCodeApi;
 const vscode = acquireVsCodeApi();
 
-const webcontainerAtom = atom<WebContainer | null>(null)
+export const webcontainerAtom = atom<WebContainer | null>(null)
 export const initializingFinishedAtom = atom<boolean>(false)
 
 function App() {
     const initializingFinished = useAtomValue(initializingFinishedAtom)
-    const [webcontainer, setWebcontainer] = useAtom(webcontainerAtom)
+    const webcontainer = useAtomValue(webcontainerAtom)
 
     useEffect(() => {
         window.addEventListener('message', event => {
@@ -36,20 +36,11 @@ function App() {
                     break;
             }
         });
-
-        // vscode.postMessage({command: 'findSmartContracts'})
-        // void initializeWebcontainer()
+        vscode.postMessage({command: 'findSmartContracts'})
     }, [])
 
-    const initializeWebcontainer = async () => {
-        const webcontainerInstance = await WebContainer.boot();
-        setWebcontainer(webcontainerInstance)
-        // await webcontainerInstance.mount();
-        const shellProcess = await webcontainerInstance.spawn('jsh');
-    }
-
     const onReload = () => {
-        // vscode.postMessage({command: 'reloadFiles'})
+        vscode.postMessage({command: 'reloadFiles'})
     }
 
     const deploySmartContract = async (path: string, feePayerKey: string) => {

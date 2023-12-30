@@ -1,18 +1,19 @@
 import 'xterm/css/xterm.css';
-import {useEffect, useRef, useState} from 'react'
+import {useEffect, useState} from 'react'
 import {WebContainer} from "@webcontainer/api";
 import {Terminal} from 'xterm'
 import {FitAddon} from 'xterm-addon-fit';
-import {useSetAtom} from "jotai";
-import {initializingFinishedAtom} from "./App";
+import {useAtom, useSetAtom} from "jotai";
+import {initializingFinishedAtom, webcontainerAtom} from "./App";
 
 const WebContainerTerminal = ({vscode}) => {
-    const webcontainerInstance = useRef<any>();
+    const [webcontainer, setWebcontainer] = useAtom(webcontainerAtom)
+
     const setInitializingFinished = useSetAtom(initializingFinishedAtom)
     const [isInitializing, setIsInitializing] = useState(true)
 
     const reloadFiles = async (files) => {
-        await webcontainerInstance.current.mount(files);
+        await webcontainer?.mount(files);
     }
 
     useEffect(() => {
@@ -20,7 +21,7 @@ const WebContainerTerminal = ({vscode}) => {
             const message = event.data;
             switch (message.command) {
                 case 'updateFile':
-                    webcontainerInstance.current.fs.writeFile(message.path, message.value)
+                    webcontainer?.fs.writeFile(message.path, message.value)
                     break;
                 case 'loadFiles':
                     (async () => {
@@ -32,15 +33,16 @@ const WebContainerTerminal = ({vscode}) => {
                         terminal.loadAddon(fitAddon);
                         terminal.open(terminalEl);
                         fitAddon.fit();
-                        webcontainerInstance.current = await WebContainer.boot();
+                        const webcontainerInstance = await WebContainer.boot();
                         const bootFiles = message.files
-                        await webcontainerInstance.current.mount(bootFiles);
+                        await webcontainerInstance.mount(bootFiles);
+                        setWebcontainer(webcontainerInstance);
 
-                        webcontainerInstance.current.on("server-ready", (port, url) => {
+                        webcontainerInstance.on("server-ready", (port, url) => {
                             vscode.postMessage({command: 'preview', text: url})
                         });
 
-                        const shellProcess = await webcontainerInstance.current.spawn('jsh');
+                        const shellProcess = await webcontainerInstance.spawn('jsh');
 
                         const xtermResizeOb = new ResizeObserver(function (entries) {
                             fitAddon.fit();
