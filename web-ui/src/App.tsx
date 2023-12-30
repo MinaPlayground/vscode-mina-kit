@@ -27,13 +27,14 @@ function App() {
     const initializingFinished = useAtomValue(initializingFinishedAtom)
     const webcontainer = useAtomValue(webcontainerAtom)
     const [path, setPath] = useState('')
+    const [items, setItems] = useState([])
 
     useEffect(() => {
         window.addEventListener('message', event => {
             const message = event.data;
             switch (message.command) {
                 case 'findSmartContracts':
-                    console.log(message.items);
+                    setItems(message.items)
                     break;
             }
         });
@@ -45,10 +46,17 @@ function App() {
 
     const deploySmartContract = async (path: string, feePayerKey: string) => {
         if (!webcontainer) return
-        const process = await webcontainer.spawn("npm", [
+        const process = await webcontainer.spawn(`cd ${path} && npm`, [
             "run",
             "build",
         ]);
+        process.output.pipeTo(
+            new WritableStream({
+                write(data) {
+                    console.log(data)
+                },
+            })
+        );
         await process?.exit;
 
         const deployProcess = await webcontainer.spawn("npx", [
@@ -128,7 +136,7 @@ function App() {
             </section>
             <CTAModal title="Deploy Smart Contract" id="deployModal">
                 <Select title="Select a Smart Contract"
-                        items={[{value: '/test', name: 'Test'}, {value: '/test2', name: 'Test2'}]}
+                        items={items}
                         onChange={() => null}/>
                 <label className="form-control w-full max-w-xs">
                     <div className="label">
@@ -137,6 +145,7 @@ function App() {
                     <input type="text" placeholder="e.g. contracts" value={path} onChange={(event) => setPath(event.target.value)} className="input input-bordered w-full max-w-xs"/>
                 </label>
                 <div className="modal-action">
+                    <button onClick={() => deploySmartContract('contracts', 'test')} className="btn">Deploy</button>
                     <button onClick={() => vscode.postMessage({command: 'findSmartContracts', path})} className="btn">Submit</button>
                     <form method="dialog">
                         <button className="btn">Close</button>

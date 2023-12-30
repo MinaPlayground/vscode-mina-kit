@@ -31,7 +31,7 @@ export const getSmartContractItems = async (dir: Uri, items = []) => {
             const readData = await workspace.fs.readFile(filePath);
             const value = new TextDecoder().decode(readData);
             const foundItems = [...value.matchAll(/class (\w*) extends SmartContract/gi)];
-            const newItems = foundItems.map(item => ({value: name, name: item}))
+            const newItems = foundItems.map(item => ({value: name, name: item[1]}))
             items.push(...newItems)
         }
         if (type === FileType.Directory) {
